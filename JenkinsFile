@@ -11,8 +11,7 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                sh 'npm ci'
-                sh 'npx cypress verify'
+                sh 'npm install'
             }
         }
         stage('Build') {
