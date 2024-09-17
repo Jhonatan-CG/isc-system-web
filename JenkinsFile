@@ -26,13 +26,16 @@ pipeline {
             }
         }
         stage('Start Server') {
-            steps {
-                sh 'nohup npm run dev &'
-            }
+            sh 'nohup npm run dev &'
+            script {
+                sleep 20 // Incrementamos el tiempo de espera a 20 segundos
+                // También podrías hacer un curl para verificar que el servidor esté arriba:
+                sh 'curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:5173/login'
+        }
         }
         stage('Cypress Tests') {
             steps {
-                sh 'npx cypress run'
+                sh 'npx cypress run --headed --no-experimental-loader-warnings'
             }
         }
     }
