@@ -4,27 +4,15 @@ pipeline {
         nodejs '20'
     }
     stages {
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                    apt-get update
-                    apt-get install -y xvfb libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-                '''
-            }
-        }
         stage('Clone Project') {
             steps {
                 git branch: 'qa', url: 'https://github.com/Jhonatan-CG/isc-system-web.git'
             }
         }
-        stage('Install Node Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 sh 'npm ci'
-            }
-        }
-        stage('TypeScript Compilation') {
-            steps {
-                sh 'npx tsc --noEmit'
+                sh 'npx cypress verify'
             }
         }
         stage('Build') {
@@ -32,10 +20,21 @@ pipeline {
                 sh 'npm run build'
             }
         }
-        stage('Cypress') {
+        stage('Start Server') {
+            steps {
+                sh 'nohup npm run start &'
+                sh 'sleep 10' // Give the server some time to start
+            }
+        }
+        stage('Cypress Tests') {
             steps {
                 sh 'npx cypress run'
             }
+        }
+    }
+    post {
+        always {
+            sh 'pkill -f "npm run start"'
         }
     }
 }
