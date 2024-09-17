@@ -20,9 +20,15 @@ pipeline {
             }
 
         }
-        stage('Cypress'){
-            steps{
-                sh 'npx cypress open'
+         stage('Install Xvfb') {
+            steps {
+                sh 'sudo apt-get update'
+                sh 'sudo apt-get install -y xvfb'
+            }
+        }
+        stage('Cypress') {
+            steps {
+                sh 'npx cypress run'
             }
         }
     }
