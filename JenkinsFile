@@ -22,18 +22,12 @@ pipeline {
         stage('Start Server') {
             steps {
                 sh 'nohup npm run dev &'
-                sh 'sleep 10' // Give the server some time to start
             }
         }
         stage('Cypress Tests') {
             steps {
                 sh 'npx cypress run'
             }
-        }
-    }
-    post {
-        always {
-            sh 'pkill -f "npm run dev"'
         }
     }
 }
