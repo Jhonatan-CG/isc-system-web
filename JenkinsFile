@@ -6,46 +6,60 @@ pipeline {
     stages {
         stage('Clone Project') {
             steps {
+                script {
+                    echo 'Cloning the project repository...'
+                }
                 git branch: 'qa', url: 'https://github.com/Jhonatan-CG/isc-system-web.git'
             }
         }
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
-            }
-        }
-        stage('Build') {
-            steps {
                 script {
-                    try {
-                        sh 'npm run build'
-                    } catch (err) {
-                        echo "Build failed, but continuing with pipeline: ${err}"
-                    }
+                    echo 'Installing global dependencies with Yarn...'
                 }
-            }
-        }
-        stage('Start Server') {
-            steps {
-                // Inicia el servidor en segundo plano
-                sh 'nohup npm run dev &'
+                sh 'npm install -g yarn'
                 script {
-                    sleep 20 // Espera para asegurarse de que el servidor esté en funcionamiento
-                    // Verifica que el servidor esté corriendo
-                    sh 'curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:5173/login'
+                    echo 'Installing project dependencies with Yarn...'
                 }
+                sh 'yarn install'
             }
         }
         stage('Install Cypress') {
             steps {
-                // Asegúrate de que Cypress esté instalado
-                sh 'npm install cypress --save-dev'
+                script {
+                    echo 'Adding Cypress as a dev dependency...'
+                }
+                sh 'yarn add cypress --dev'
             }
         }
-        stage('Cypress Tests') {
+        stage('Install Xvfb and Dependencies') {
             steps {
-                sh 'npx cypress run --headed --no-experimental-loader-warnings'
+                script {
+                    echo 'Installing Xvfb and necessary dependencies...'
+                }
+                sh '''
+                    apt-get update
+                    apt-get install -y xvfb libgtk2.0-0 libgtk-3-0 libgbm-dev \
+                    libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 \
+                    libxtst6 libx11-xcb1
+                '''
             }
+        }
+        stage('Run e2e Tests') {
+            steps {
+                script {
+                    echo 'Running end-to-end tests with Cypress...'
+                }
+                sh 'xvfb-run --auto-servernum -- npx cypress run'
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                echo 'Cleaning up workspace...'
+            }
+            cleanWs()
         }
     }
 }
