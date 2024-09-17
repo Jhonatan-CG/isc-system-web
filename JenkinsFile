@@ -22,7 +22,7 @@ pipeline {
         }
         stage('Start Server') {
             steps {
-                sh 'nohup npm run start &'
+                sh 'nohup npm run dev &'
                 sh 'sleep 10' // Give the server some time to start
             }
         }
@@ -34,7 +34,7 @@ pipeline {
     }
     post {
         always {
-            sh 'pkill -f "npm run start"'
+            sh 'pkill -f "npm run dev"'
         }
     }
 }
