@@ -22,7 +22,7 @@ pipeline {
         }
         stage('Cypress'){
             steps{
-                sh 'npx cypress run'
+                sh 'npx cypress open'
             }
         }
     }
