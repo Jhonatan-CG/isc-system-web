@@ -15,7 +15,7 @@ pipeline {
             }
         }
         stage('Build') {
-           steps {
+            steps {
                 script {
                     try {
                         sh 'npm run build'
@@ -27,12 +27,19 @@ pipeline {
         }
         stage('Start Server') {
             steps {
+                // Inicia el servidor en segundo plano
                 sh 'nohup npm run dev &'
                 script {
-                    sleep 20 // Incrementamos el tiempo de espera a 20 segundos
-                    // También podrías hacer un curl para verificar que el servidor esté arriba:
+                    sleep 20 // Espera para asegurarse de que el servidor esté en funcionamiento
+                    // Verifica que el servidor esté corriendo
                     sh 'curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:5173/login'
                 }
+            }
+        }
+        stage('Install Cypress') {
+            steps {
+                // Asegúrate de que Cypress esté instalado
+                sh 'npm install cypress --save-dev'
             }
         }
         stage('Cypress Tests') {
