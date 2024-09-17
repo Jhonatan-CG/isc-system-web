@@ -22,6 +22,11 @@ pipeline {
                 sh 'npm ci'
             }
         }
+        stage('TypeScript Compilation') {
+            steps {
+                sh 'npx tsc --noEmit'
+            }
+        }
         stage('Build') {
            steps {
                 sh 'npm run build'
