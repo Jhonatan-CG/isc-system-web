@@ -4,6 +4,11 @@ pipeline {
         nodejs '20'
     }
     stages {
+        stage('Install Xvfb') {
+            steps {
+                sh 'apt-get update && apt-get install -y xvfb'
+            }
+        }
         stage('Clone Project') {
             steps {
                 git branch: 'qa', url: 'https://github.com/Jhonatan-CG/isc-system-web.git'
@@ -19,12 +24,6 @@ pipeline {
                 sh 'npm install'
             }
 
-        }
-         stage('Install Xvfb') {
-            steps {
-                sh 'sudo apt-get update'
-                sh 'sudo apt-get install -y xvfb'
-            }
         }
         stage('Cypress') {
             steps {
